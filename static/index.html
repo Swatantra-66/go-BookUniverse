@@ -454,18 +454,6 @@
         background: #fff0f0;
       }
 
-      .tab-btn {
-        padding: 10px;
-        cursor: pointer;
-        font-weight: 600;
-        color: #888;
-        border-bottom: 2px solid transparent;
-      }
-      .tab-btn.active {
-        color: var(--primary);
-        border-bottom: 2px solid var(--primary);
-      }
-
       @keyframes fadeIn {
         from {
           opacity: 0;
@@ -749,81 +737,26 @@
         }
       };
 
-      // TAB SWITCHING LOGIC
-      function switchTab(tab) {
-        document.getElementById("login-form").style.display = "none";
-        document.getElementById("signup-form").style.display = "none";
-        document.getElementById("reset-form").style.display = "none";
-        document
-          .querySelectorAll(".tab-btn")
-          .forEach((el) => el.classList.remove("active"));
-
-        if (tab === "login") {
-          document.getElementById("login-form").style.display = "block";
-          document.querySelectorAll(".tab-btn")[0].classList.add("active");
-        } else if (tab === "signup") {
-          document.getElementById("signup-form").style.display = "block";
-          document.querySelectorAll(".tab-btn")[1].classList.add("active");
-        } else {
-          document.getElementById("reset-form").style.display = "block";
-        }
-      }
-
-      // 1. HANDLE SIGNUP
-      async function handleSignup(e) {
+      function handleAuth(e) {
         e.preventDefault();
-        const userData = {
-          name: document.getElementById("signup-name").value,
-          username: document.getElementById("signup-user").value,
-          email: document.getElementById("signup-email").value,
-          password: document.getElementById("signup-pass").value,
-        };
-
-        const res = await fetch("/signup", {
-          // Your new endpoint
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(userData),
-        });
-
-        if (res.ok) {
-          alert("Account created! Please login.");
-          switchTab("login");
+        const email = document.getElementById("auth-email").value;
+        const pass = document.getElementById("auth-pass").value;
+        let dbUser = localStorage.getItem("dbUser_" + email);
+        if (dbUser) {
+          dbUser = JSON.parse(dbUser);
+          if (dbUser.password === pass) loginUser(dbUser);
+          else alert("Incorrect Password!");
         } else {
-          alert("Username or Email already exists!");
+          const newUser = {
+            name: email.split("@")[0],
+            email: email,
+            password: pass,
+            avatar: DEFAULT_PROFILE_IMG,
+          };
+          localStorage.setItem("dbUser_" + email, JSON.stringify(newUser));
+          loginUser(newUser);
+          alert("Account created successfully!");
         }
-      }
-
-      // 2. HANDLE LOGIN
-      async function handleLogin(e) {
-        e.preventDefault();
-        const creds = {
-          email: document.getElementById("login-email").value,
-          password: document.getElementById("login-pass").value,
-        };
-
-        const res = await fetch("/login", {
-          // Your new endpoint
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(creds),
-        });
-
-        if (res.ok) {
-          const user = await res.json();
-          loginUser(user); // Reuse your existing helper
-        } else {
-          alert("Invalid Email or Password");
-        }
-      }
-
-      // 3. HANDLE RESET (Placeholder)
-      async function handleResetRequest(e) {
-        e.preventDefault();
-        const email = document.getElementById("reset-email").value;
-        // You need to build the backend endpoint for this later
-        alert(`If an account exists for ${email}, a reset link has been sent!`);
-        switchTab("login");
       }
 
       function loginUser(user) {
