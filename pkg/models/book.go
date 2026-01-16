@@ -16,14 +16,6 @@ type Book struct {
 	IsFav       bool   `json:"isFav"`
 }
 
-type User struct {
-	gorm.Model
-	Name     string `json:"name"`
-	Username string `json:"username" gorm:"unique"`
-	Email    string `json:"email" gorm:"unique"`
-	Password string `json:"password"`
-}
-
 func (b *Book) Validate() string {
 	if b.Name == "" {
 		return "Book name cannot be empty"
@@ -41,7 +33,6 @@ func init() {
 	config.Connect()
 	db = config.GetDB()
 	db.AutoMigrate(&Book{})
-	db.AutoMigrate(&User{})
 }
 
 func (b *Book) CreateBook() *Book {
@@ -92,16 +83,4 @@ func GetBooksByUser(email string) []Book {
 	var Books []Book
 	db.Where("user_email = ?", email).Find(&Books)
 	return Books
-}
-
-func CheckLogin(email, password string) (*User, error) {
-	var user User
-	result := db.Where("email = ? AND password = ?", email, password).First(&user)
-	return &user, result.Error
-}
-
-func CreateUser(u *User) *User {
-	db.NewRecord(u)
-	db.Create(&u)
-	return u
 }
