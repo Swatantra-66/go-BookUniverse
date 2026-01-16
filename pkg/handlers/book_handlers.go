@@ -117,3 +117,15 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func GetBookByUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	userEmail := r.URL.Query().Get("user")
+	newBooks := models.GetBooksByUser(userEmail)
+
+	if err := json.NewEncoder(w).Encode(newBooks); err != nil {
+		http.Error(w, "Failed to fetch book", http.StatusInternalServerError)
+		return
+	}
+}
