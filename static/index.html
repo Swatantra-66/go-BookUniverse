@@ -133,21 +133,17 @@
 
       /* --- UI ELEMENTS --- */
       .brand {
-        font-size: 1.5rem; /* Larger and more prominent font size */
-        font-weight: 700; /* Bolder weight (700 is bold) for impact */
-        color: var(
-          --primary,
-          #005f73
-        ); /* Use a CSS variable with a fallback color */
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary, #005f73);
         display: flex;
         align-items: center;
-        gap: 12px; /* Slightly more space between logo elements if you add an icon later */
+        gap: 12px;
         margin-bottom: 40px;
-        padding-left: 0; /* Align with other content, or keep padding-left: 10px if needed for your layout */
-        text-transform: uppercase; /* Makes the logo text look more formal and intentional */
-        letter-spacing: -0.5px; /* Subtle negative letter spacing can improve the look of large, bold text */
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Adds a subtle depth effect */
-        /* Ensure a professional font is used, imported via @font-face or a service like Google Fonts */
+        padding-left: 0;
+        text-transform: uppercase;
+        letter-spacing: -0.5px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         font-family: "Helvetica Neue", Arial, sans-serif;
       }
 
@@ -264,6 +260,19 @@
         right: 20px;
         cursor: pointer;
         font-size: 1.2rem;
+      }
+
+      /* --- TABS (NEW) --- */
+      .tab-btn {
+        padding: 10px;
+        cursor: pointer;
+        font-weight: 600;
+        color: #888;
+        border-bottom: 2px solid transparent;
+      }
+      .tab-btn.active {
+        color: var(--primary);
+        border-bottom: 2px solid var(--primary);
       }
 
       /* --- SEARCH BAR --- */
@@ -497,109 +506,6 @@
 
     <div class="modal-overlay" id="auth-modal">
       <div class="auth-box">
-        <h2 id="auth-title">Welcome</h2>
-        <p id="auth-desc">Sign in or create an account</p>
-        <br />
-        <form onsubmit="handleAuth(event)">
-          <input
-            type="email"
-            id="auth-email"
-            class="auth-input"
-            placeholder="Email Address"
-            required
-          />
-          <input
-            type="password"
-            id="auth-pass"
-            class="auth-input"
-            placeholder="Password"
-            required
-          />
-          <button type="submit" class="auth-btn">Start Reading</button>
-        </form>
-      </div>
-    </div>
-
-    <div class="modal-overlay" id="settings-modal">
-      <div class="auth-box">
-        <i class="bx bx-x close-icon" onclick="toggleSettings()"></i>
-        <h3>Settings</h3>
-        <p>Update your credentials</p>
-        <br />
-        <form onsubmit="changePassword(event)">
-          <input
-            type="password"
-            id="new-pass"
-            class="auth-input"
-            placeholder="New Password"
-            required
-          />
-          <button type="submit" class="auth-btn">Update Password</button>
-        </form>
-      </div>
-    </div>
-
-    <div class="app-container">
-      <nav class="sidebar" id="sidebar">
-        <div>
-          <div class="brand">
-            <i class="bx bxs-book-heart"></i>
-            <span>BookUniverse</span>
-          </div>
-          <ul class="nav-links">
-            <li
-              class="nav-item active"
-              id="nav-library"
-              onclick="showAllBooks()"
-            >
-              <i class="bx bxs-dashboard"></i>
-              <span>Library</span>
-            </li>
-            <li class="nav-item" onclick="toggleAddModal()">
-              <i class="bx bxs-plus-circle"></i>
-              <span>Add Book</span>
-            </li>
-            <li class="nav-item" id="nav-fav" onclick="filterFavorites()">
-              <i class="bx bxs-heart"></i>
-              <span>Favorites</span>
-            </li>
-            <li class="nav-item" onclick="toggleSettings()">
-              <i class="bx bxs-cog"></i>
-              <span>Settings</span>
-            </li>
-          </ul>
-        </div>
-
-        <div class="user-profile" id="user-profile">
-          <div class="user-avatar" id="user-avatar">U</div>
-          <div class="user-info">
-            <h4 id="user-name">User</h4>
-            <p id="user-email">...</p>
-          </div>
-          <i
-            class="bx bx-log-out"
-            style="margin-left: auto; color: #ff7675"
-            onclick="handleLogout()"
-            title="Logout"
-          ></i>
-        </div>
-      </nav>
-
-      <main class="main-content">
-        <div class="search-container">
-          <input
-            type="text"
-            id="search-box"
-            placeholder="🔍 Search your collection..."
-            onkeyup="filterBooks()"
-          />
-        </div>
-        <div id="book-grid" class="book-grid"></div>
-      </main>
-    </div>
-
-    <div class="modal-overlay" id="auth-modal">
-      <div class="auth-box">
         <div
           style="
             display: flex;
@@ -707,6 +613,112 @@
       </div>
     </div>
 
+    <div class="modal-overlay" id="settings-modal">
+      <div class="auth-box">
+        <i class="bx bx-x close-icon" onclick="toggleSettings()"></i>
+        <h3>Settings</h3>
+        <p>Update your credentials</p>
+        <br />
+        <form onsubmit="changePassword(event)">
+          <input
+            type="password"
+            id="new-pass"
+            class="auth-input"
+            placeholder="New Password"
+            required
+          />
+          <button type="submit" class="auth-btn">Update Password</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="form-modal">
+      <div class="auth-box" style="width: 400px">
+        <i class="bx bx-x close-icon" onclick="toggleAddModal()"></i>
+        <h3 id="form-title">📖 Add New Book</h3>
+        <br />
+        <input type="hidden" id="book-id" />
+        <input
+          type="text"
+          id="name"
+          class="auth-input"
+          placeholder="Book Title"
+        />
+        <input
+          type="text"
+          id="author"
+          class="auth-input"
+          placeholder="Author Name"
+        />
+        <input
+          type="text"
+          id="pub"
+          class="auth-input"
+          placeholder="Publisher"
+        />
+        <button class="auth-btn" onclick="handleFormSubmit()">Save Book</button>
+      </div>
+    </div>
+
+    <div class="app-container">
+      <nav class="sidebar" id="sidebar">
+        <div>
+          <div class="brand">
+            <i class="bx bxs-book-heart"></i>
+            <span>BookUniverse</span>
+          </div>
+          <ul class="nav-links">
+            <li
+              class="nav-item active"
+              id="nav-library"
+              onclick="showAllBooks()"
+            >
+              <i class="bx bxs-dashboard"></i>
+              <span>Library</span>
+            </li>
+            <li class="nav-item" onclick="toggleAddModal()">
+              <i class="bx bxs-plus-circle"></i>
+              <span>Add Book</span>
+            </li>
+            <li class="nav-item" id="nav-fav" onclick="filterFavorites()">
+              <i class="bx bxs-heart"></i>
+              <span>Favorites</span>
+            </li>
+            <li class="nav-item" onclick="toggleSettings()">
+              <i class="bx bxs-cog"></i>
+              <span>Settings</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="user-profile" id="user-profile">
+          <div class="user-avatar" id="user-avatar">U</div>
+          <div class="user-info">
+            <h4 id="user-name">User</h4>
+            <p id="user-email">...</p>
+          </div>
+          <i
+            class="bx bx-log-out"
+            style="margin-left: auto; color: #ff7675"
+            onclick="handleLogout()"
+            title="Logout"
+          ></i>
+        </div>
+      </nav>
+
+      <main class="main-content">
+        <div class="search-container">
+          <input
+            type="text"
+            id="search-box"
+            placeholder="🔍 Search your collection..."
+            onkeyup="filterBooks()"
+          />
+        </div>
+        <div id="book-grid" class="book-grid"></div>
+      </main>
+    </div>
+
     <div id="toast" class="toast">Action Successful!</div>
 
     <script>
@@ -726,7 +738,7 @@
         }
       }
 
-      /* --- 2. AUTH LOGIC --- */
+      /* --- 2. AUTH LOGIC (Backend Connected) --- */
       window.onload = function () {
         const storedUser = localStorage.getItem("bookUser");
         if (!storedUser) {
@@ -737,26 +749,79 @@
         }
       };
 
-      function handleAuth(e) {
-        e.preventDefault();
-        const email = document.getElementById("auth-email").value;
-        const pass = document.getElementById("auth-pass").value;
-        let dbUser = localStorage.getItem("dbUser_" + email);
-        if (dbUser) {
-          dbUser = JSON.parse(dbUser);
-          if (dbUser.password === pass) loginUser(dbUser);
-          else alert("Incorrect Password!");
+      // NEW: Tab Switching Logic
+      function switchTab(tab) {
+        document.getElementById("login-form").style.display = "none";
+        document.getElementById("signup-form").style.display = "none";
+        document.getElementById("reset-form").style.display = "none";
+
+        // Remove active class from buttons
+        document
+          .querySelectorAll(".tab-btn")
+          .forEach((el) => el.classList.remove("active"));
+
+        if (tab === "login") {
+          document.getElementById("login-form").style.display = "block";
+          document.querySelectorAll(".tab-btn")[0].classList.add("active");
+        } else if (tab === "signup") {
+          document.getElementById("signup-form").style.display = "block";
+          document.querySelectorAll(".tab-btn")[1].classList.add("active");
         } else {
-          const newUser = {
-            name: email.split("@")[0],
-            email: email,
-            password: pass,
-            avatar: DEFAULT_PROFILE_IMG,
-          };
-          localStorage.setItem("dbUser_" + email, JSON.stringify(newUser));
-          loginUser(newUser);
-          alert("Account created successfully!");
+          document.getElementById("reset-form").style.display = "block";
         }
+      }
+
+      // NEW: Handle Login
+      async function handleLogin(e) {
+        e.preventDefault();
+        const creds = {
+          email: document.getElementById("login-email").value,
+          password: document.getElementById("login-pass").value,
+        };
+
+        const res = await fetch("/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(creds),
+        });
+
+        if (res.ok) {
+          const user = await res.json();
+          loginUser(user);
+        } else {
+          alert("Invalid Email or Password");
+        }
+      }
+
+      // NEW: Handle Signup
+      async function handleSignup(e) {
+        e.preventDefault();
+        const userData = {
+          name: document.getElementById("signup-name").value,
+          username: document.getElementById("signup-user").value,
+          email: document.getElementById("signup-email").value,
+          password: document.getElementById("signup-pass").value,
+        };
+
+        const res = await fetch("/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(userData),
+        });
+
+        if (res.ok) {
+          alert("Account created! Please login.");
+          switchTab("login");
+        } else {
+          alert("Username or Email already exists!");
+        }
+      }
+
+      // NEW: Handle Reset (Simulation)
+      function handleResetRequest(e) {
+        e.preventDefault();
+        alert("Reset functionality coming soon!");
+        switchTab("login");
       }
 
       function loginUser(user) {
@@ -800,16 +865,16 @@
 
       function changePassword(e) {
         e.preventDefault();
+        // Since we are moving to backend auth, this would ideally hit an API endpoint too.
+        // For now, we update local object just to keep the UI responsive.
         const newPass = document.getElementById("new-pass").value;
         const currentUser = JSON.parse(localStorage.getItem("bookUser"));
         currentUser.password = newPass;
-        localStorage.setItem(
-          "dbUser_" + currentUser.email,
-          JSON.stringify(currentUser)
-        );
         localStorage.setItem("bookUser", JSON.stringify(currentUser));
         toggleSettings();
-        showToast("Password Updated Successfully!");
+        showToast(
+          "Password updated locally (connect API for permanent change)"
+        );
       }
 
       // --- FILTER: Show Favorites ---
@@ -879,7 +944,6 @@
           if (!currentUser) return;
 
           // 3. Fetch with the user's email in the URL
-          // Old: const response = await fetch(API_URL);
           const response = await fetch(`${API_URL}?user=${currentUser.email}`);
 
           const data = await response.json();
@@ -1005,7 +1069,7 @@
           name: document.getElementById("name").value,
           author: document.getElementById("author").value,
           publication: document.getElementById("pub").value,
-          user_email: currentUser ? currentUser.email : "", // <--- The Important New Line
+          user_email: currentUser ? currentUser.email : "",
         };
 
         // Preserve favorite status if editing
