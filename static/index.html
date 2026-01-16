@@ -791,12 +791,21 @@
 
       async function loadBooks() {
         try {
-          const response = await fetch(API_URL);
+          // 1. Get the logged-in user
+          const currentUser = JSON.parse(localStorage.getItem("bookUser"));
+
+          // 2. Safety check: If no one is logged in, stop here.
+          if (!currentUser) return;
+
+          // 3. Fetch with the user's email in the URL
+          // Old: const response = await fetch(API_URL);
+          const response = await fetch(`${API_URL}?user=${currentUser.email}`);
+
           const data = await response.json();
           allBooks = data || [];
           renderGrid(allBooks);
         } catch (error) {
-          console.error(error);
+          console.error("Error loading books:", error);
         }
       }
 
@@ -906,10 +915,16 @@
 
       async function handleFormSubmit() {
         const id = document.getElementById("book-id").value;
+
+        // 1. Get the logged-in user
+        const currentUser = JSON.parse(localStorage.getItem("bookUser"));
+
+        // 2. Add user_email to the book data
         const bookData = {
           name: document.getElementById("name").value,
           author: document.getElementById("author").value,
           publication: document.getElementById("pub").value,
+          user_email: currentUser ? currentUser.email : "", // <--- The Important New Line
         };
 
         // Preserve favorite status if editing
@@ -920,11 +935,13 @@
 
         const method = isEditing ? "PUT" : "POST";
         const url = isEditing ? `${API_URL}/${id}` : API_URL;
+
         await fetch(url, {
           method: method,
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(bookData),
         });
+
         const msg = isEditing
           ? "Book Updated Successfully!"
           : "New Book Added!";
