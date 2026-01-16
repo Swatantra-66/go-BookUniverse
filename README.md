@@ -1,8 +1,8 @@
 # 📚 BookUniverse Pro
 
-A modern, full-stack Book Management System powered by a robust **Backend API written in Go (Golang)**. This application demonstrates scalable RESTful architecture, integrating with MySQL and external services to create a seamless digital library experience wrapped in a beautiful Glassmorphism UI.
+A modern, full-stack Book Management System powered by a robust **Backend API written in Golang**. This application demonstrates scalable RESTful architecture, integrating with MySQL and external services to create a seamless digital library experience wrapped in a beautiful Glassmorphism UI.
 
-![BookUniverse Screenshot](https://via.placeholder.com/800x400?text=Add+Your+Screenshot+Here)
+![BookUniverse Screenshot](https://github.com/user-attachments/assets/848b7245-238c-4d14-b877-d7a83818790f")
 
 ## ✨ Key Features
 
@@ -41,8 +41,8 @@ A modern, full-stack Book Management System powered by a robust **Backend API wr
 1.  **Clone the repository**
 
     ```bash
-    git clone [https://github.com/Swatantra-66/BookUniverse.git](https://github.com/Swatantra-666/BookUniverse.git)
-    cd BookUniverse
+    git clone [https://github.com/Swatantra-66/go-bookstore.git](https://github.com/Swatantra-66/go-bookstore.git)
+    cd BookManagementAPI
     ```
 
 2.  **Setup Database**
@@ -89,3 +89,7 @@ go-bookstore/
 ├── .env
 └── README.md
 ```
+
+## 🤝 Contributing
+
+Feel free to fork this project and submit pull requests.
