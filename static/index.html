@@ -490,6 +490,18 @@
         transform: translateY(0);
         opacity: 1;
       }
+
+      .tab-btn {
+        padding: 10px;
+        cursor: pointer;
+        font-weight: 600;
+        color: #888;
+        border-bottom: 2px solid transparent;
+      }
+      .tab-btn.active {
+        color: var(--primary);
+        border-bottom: 2px solid var(--primary);
+      }
     </style>
   </head>
   <body>
@@ -749,7 +761,7 @@
         }
       };
 
-      // NEW: Tab Switching Logic
+      // Tab Switching Logic
       function switchTab(tab) {
         document.getElementById("login-form").style.display = "none";
         document.getElementById("signup-form").style.display = "none";
@@ -771,7 +783,7 @@
         }
       }
 
-      // NEW: Handle Login
+      // Handle Login
       async function handleLogin(e) {
         e.preventDefault();
         const creds = {
@@ -793,7 +805,7 @@
         }
       }
 
-      // NEW: Handle Signup
+      // Handle Signup
       async function handleSignup(e) {
         e.preventDefault();
         const userData = {
@@ -817,7 +829,7 @@
         }
       }
 
-      // NEW: Handle Reset (Simulation)
+      // Handle Reset (Simulation)
       function handleResetRequest(e) {
         e.preventDefault();
         alert("Reset functionality coming soon!");
@@ -865,8 +877,6 @@
 
       function changePassword(e) {
         e.preventDefault();
-        // Since we are moving to backend auth, this would ideally hit an API endpoint too.
-        // For now, we update local object just to keep the UI responsive.
         const newPass = document.getElementById("new-pass").value;
         const currentUser = JSON.parse(localStorage.getItem("bookUser"));
         currentUser.password = newPass;
@@ -887,7 +897,7 @@
         const favBooks = allBooks.filter((b) => b.isFav);
         renderGrid(favBooks);
 
-        if (window.innerWidth <= 992) handleSidebarToggle(); // Close sidebar on mobile
+        if (window.innerWidth <= 992) handleSidebarToggle();
       }
 
       // --- FILTER: Show All ---
