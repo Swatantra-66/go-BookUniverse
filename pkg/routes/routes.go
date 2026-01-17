@@ -9,6 +9,9 @@ import (
 
 // book routing
 func RegisterBookRoutes(router *mux.Router) {
+	router.HandleFunc("/signup", handlers.SignUp).Methods("POST")
+	router.HandleFunc("/login", handlers.Login).Methods("POST")
+
 	router.HandleFunc("/book", handlers.GetBookByUser).Methods("GET")
 	router.HandleFunc("/book/{bookId}", handlers.GetBookById).Methods("GET")
 	router.HandleFunc("/book", handlers.CreateBook).Methods("POST")
