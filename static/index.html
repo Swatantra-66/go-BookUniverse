@@ -26,14 +26,41 @@
       <i class="bx bx-menu" id="sidebar-icon"></i>
     </button>
 
-    <button
-      type="button"
-      class="theme-toggle"
-      onclick="toggleDarkMode()"
-      aria-label="Toggle Theme"
-    >
-      <i class="bx bxs-moon" id="theme-icon-main"></i>
-    </button>
+    <div class="top-actions">
+      <div class="dropdown">
+        <button
+          type="button"
+          class="theme-toggle"
+          style="position: static"
+          onclick="document.getElementById('aboutDropdown').classList.toggle('show')"
+          title="About Project"
+        >
+          <i class="bx bx-info-circle"></i>
+        </button>
+        <div id="aboutDropdown" class="dropdown-content">
+          <a href="mailto:maverickswatantra@gmail.com">
+            <i class="bx bxs-envelope"></i> Contact Owner
+          </a>
+          <a
+            href="https://github.com/Swatantra-66/go-BookUniverse"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <i class="bx bxl-github"></i> Source Code
+          </a>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="theme-toggle"
+        onclick="toggleDarkMode()"
+        aria-label="Toggle Theme"
+        style="position: static"
+      >
+        <i class="bx bxs-moon" id="theme-icon-main"></i>
+      </button>
+    </div>
 
     <div class="mobile-overlay" onclick="handleSidebarToggle()"></div>
 
@@ -377,7 +404,7 @@
           </div>
           <i
             class="bx bx-log-out"
-            style="margin-left: auto; color: #ff7675"
+            style="margin-left: auto; color: #ff7675; cursor: pointer"
             onclick="handleLogout()"
             title="Logout"
           ></i>
@@ -409,5 +436,16 @@
     <div id="toast" class="toast">Action Successful!</div>
 
     <script src="js/script.js"></script>
+
+    <script>
+      window.addEventListener("click", function (e) {
+        if (!e.target.closest(".dropdown")) {
+          const dropdowns = document.getElementsByClassName("dropdown-content");
+          for (let d of dropdowns) {
+            d.classList.remove("show");
+          }
+        }
+      });
+    </script>
   </body>
 </html>
