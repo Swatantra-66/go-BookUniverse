@@ -753,3 +753,32 @@ async function magicFill() {
         btn.disabled = false;
     }
 }
+
+function toggleAbout() {
+    const submenu = document.getElementById("about-submenu");
+    const arrow = document.getElementById("about-arrow");
+
+    if (submenu.classList.contains("open")) {
+        submenu.classList.remove("open");
+        arrow.classList.remove("rotate-arrow");
+    } else {
+        submenu.classList.add("open");
+        arrow.classList.add("rotate-arrow");
+    }
+}
+
+function toggleAboutDropdown() {
+    const menu = document.getElementById("top-about-menu");
+    const isVisible = menu.style.display === "block";
+
+    menu.style.display = isVisible ? "none" : "block";
+}
+
+window.addEventListener("click", function (event) {
+    const menu = document.getElementById("top-about-menu");
+    const btn = document.querySelector(".bx-info-circle");
+
+    if (!menu.contains(event.target) && event.target !== btn && !btn.contains(event.target)) {
+        menu.style.display = "none";
+    }
+});
