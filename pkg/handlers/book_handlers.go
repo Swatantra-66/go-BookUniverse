@@ -1,7 +1,10 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -170,5 +173,78 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.NewEncoder(w).Encode(foundUser); err != nil {
 		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+	}
+}
+
+func GetPublicBooks(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	username := vars["username"]
+
+	books := models.GetBooksByHandle(username)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(books)
+}
+
+func ServePublicPage(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./static/public.html")
+}
+
+func GetAIRecommendations(w http.ResponseWriter, r *http.Request) {
+	userEmail := r.URL.Query().Get("user")
+
+	allBooks := models.GetBooksByUser(userEmail)
+	var favTitles []string
+	for _, b := range allBooks {
+		if b.IsFav {
+			favTitles = append(favTitles, b.Name)
+		}
+	}
+
+	if len(favTitles) == 0 {
+		json.NewEncoder(w).Encode(map[string]string{"answer": "<h3>Please mark some books as ❤️ Favorites first!</h3><p>I need to know what you like before I can make suggestions.</p>"})
+		return
+	}
+
+	prompt := fmt.Sprintf("I love reading these books: %v. Based on this taste, recommend 3 new books I might like. Keep the answer short, HTML formatted (use <b> for titles), and explain why for each.", favTitles)
+
+	apiKey := "AIzaSyAYk-9jXP90TauNk2Cc6rF_FsaLIVFflaE"
+	url := "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + apiKey
+
+	requestBody, _ := json.Marshal(map[string]interface{}{
+		"contents": []interface{}{
+			map[string]interface{}{
+				"parts": []interface{}{
+					map[string]string{"text": prompt},
+				},
+			},
+		},
+	})
+
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(requestBody))
+	if err != nil {
+		http.Error(w, "AI Brain freeze! Try again.", http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	var geminiResp struct {
+		Candidates []struct {
+			Content struct {
+				Parts []struct {
+					Text string `json:"text"`
+				} `json:"parts"`
+			} `json:"content"`
+		} `json:"candidates"`
+	}
+
+	json.Unmarshal(body, &geminiResp)
+
+	if len(geminiResp.Candidates) > 0 {
+		aiText := geminiResp.Candidates[0].Content.Parts[0].Text
+		json.NewEncoder(w).Encode(map[string]string{"answer": aiText})
+	} else {
+		json.NewEncoder(w).Encode(map[string]string{"answer": "Sorry, I couldn't think of anything."})
 	}
 }
