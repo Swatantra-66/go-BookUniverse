@@ -2,10 +2,17 @@ package routes
 
 import (
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/Swatantra-66/go-bookstore/pkg/handlers"
 	"github.com/gorilla/mux"
 )
+
+func getSafeDir(path string) string {
+	dir, _ := os.Getwd()
+	return filepath.Join(dir, path)
+}
 
 // book routing
 func RegisterBookRoutes(router *mux.Router) {
@@ -21,7 +28,18 @@ func RegisterBookRoutes(router *mux.Router) {
 	router.HandleFunc("/u/{username}", handlers.ServePublicPage).Methods("GET")
 	router.HandleFunc("/api/public/{username}", handlers.GetPublicBooks).Methods("GET")
 	router.HandleFunc("/recommend", handlers.GetAIRecommendations).Methods("GET")
+	router.HandleFunc("/api/magic-details", handlers.GetBookDetailsAI).Methods("GET")
 
-	fileServer := http.FileServer(http.Dir("./static"))
-	router.PathPrefix("/").Handler(http.StripPrefix("/", fileServer))
+	cssDir := getSafeDir("css")
+	jsDir := getSafeDir("js")
+
+	router.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir(cssDir))))
+	router.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir(jsDir))))
+
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "static/index.html")
+	})
+
+	staticDir := getSafeDir("static")
+	router.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir(staticDir))))
 }
