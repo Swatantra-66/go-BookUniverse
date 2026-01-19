@@ -3,11 +3,15 @@ package config
 import (
 	"os"
 
+	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-var db *gorm.DB
+var (
+	db    *gorm.DB
+	Store = sessions.NewCookieStore([]byte("super-secret-key"))
+)
 
 func Connect() {
 	dsn := os.Getenv("DSN")
