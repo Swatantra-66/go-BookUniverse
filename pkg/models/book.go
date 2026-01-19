@@ -120,3 +120,7 @@ func GetBooksByHandle(username string) []Book {
 	db.Where("user_email = ?", user.Email).Find(&books)
 	return books
 }
+
+func DeleteAllBooks(email string) {
+	db.Unscoped().Where("user_email = ?", email).Delete(&Book{})
+}
