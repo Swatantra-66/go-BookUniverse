@@ -158,17 +158,27 @@ function toggleSettings() {
     document.body.classList.remove("sidebar-active");
 }
 
-function changePassword(e) {
+async function changePassword(e) {
     e.preventDefault();
+    const newPass = document.getElementById('new-pass').value;
 
-    const newPass = document.getElementById("new-pass").value;
-    const currentUser = JSON.parse(localStorage.getItem("bookUser"));
-    currentUser.password = newPass;
-    localStorage.setItem("bookUser", JSON.stringify(currentUser));
-    toggleSettings();
-    showToast(
-        "Password updated locally (connect API for permanent change)"
-    );
+    if (!newPass) {
+        showToast("Please enter a password.");
+        return;
+    }
+
+    const res = await fetch('/api/user/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: newPass })
+    });
+
+    if (res.ok) {
+        showToast("Password updated successfully!");
+        document.getElementById('new-pass').value = "";
+    } else {
+        showToast("Failed to update password.");
+    }
 }
 
 function filterFavorites() {
@@ -261,7 +271,6 @@ function renderGrid(books) {
         return;
     }
 
-    // Case 2: Library is truly empty (New User)
     if (books.length === 0) {
         grid.innerHTML = `
             <div class="empty-state">
@@ -283,9 +292,7 @@ function renderGrid(books) {
         return;
     }
 
-    // --- RENDER BOOK CARDS (Standard) ---
     books.forEach((book) => {
-        // ... (Keep your existing card rendering code EXACTLY as it was) ...
         const imgId = `cover-${book.ID}`;
         const linkId = `read-${book.ID}`;
         const menuId = `menu-${book.ID}`;
@@ -598,7 +605,6 @@ async function getAIRecommendations() {
             throw new Error(rawText);
         }
 
-        // 3. SUCCESS PATH
         let cleanText = rawText
             .replace(/```html/g, "")
             .replace(/```/g, "")
@@ -629,8 +635,8 @@ async function getAIRecommendations() {
 
         if (closeBtn) {
             closeBtn.style.display = "inline-block";
-            closeBtn.innerText = "Close"; // Change text to Close
-            closeBtn.style.backgroundColor = "#ff7675"; // Red
+            closeBtn.innerText = "Close";
+            closeBtn.style.backgroundColor = "#ff7675";
             closeBtn.onclick = () => modal.classList.remove("open");
         }
     }
@@ -725,7 +731,6 @@ async function magicFill() {
     btn.disabled = true;
 
     try {
-        // 3. 
         const response = await fetch(`/api/magic-details?title=${encodeURIComponent(title)}`);
 
         if (!response.ok) {
@@ -782,3 +787,60 @@ window.addEventListener("click", function (event) {
         menu.style.display = "none";
     }
 });
+
+async function updateProfile(e) {
+    e.preventDefault();
+    const name = document.getElementById('set-name').value;
+
+    const res = await fetch('/api/user/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name })
+    });
+
+    if (res.ok) {
+        const keysToCheck = ['user', 'currentUser', 'profile', 'userData'];
+
+        for (const key of keysToCheck) {
+            const storedData = localStorage.getItem(key);
+            if (storedData) {
+                try {
+                    let userObj = JSON.parse(storedData);
+
+                    userObj.name = name;
+                    if (userObj.username) userObj.username = name;
+
+                    localStorage.setItem(key, JSON.stringify(userObj));
+                    console.log(`Updated name in ${key} storage!`);
+                } catch (e) {
+                }
+            }
+        }
+
+        localStorage.setItem("username", name);
+
+        document.getElementById('user-name').innerText = name;
+        showToast("Username updated! Reloading...");
+        toggleSettings();
+
+        setTimeout(() => location.reload(), 1000);
+    } else {
+        const errorText = await res.text();
+        alert("Server Error: " + errorText);
+    }
+}
+
+async function resetLibrary() {
+    const confirmed = confirm("🚨 ARE YOU SURE?\n\nThis will permanently delete every book in your library. This cannot be undone.");
+
+    if (confirmed) {
+        const res = await fetch('/api/books/reset', { method: 'DELETE' });
+
+        if (res.ok) {
+            showToast("Library has been reset.");
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast("Failed to reset library.");
+        }
+    }
+}
