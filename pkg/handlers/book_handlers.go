@@ -12,11 +12,25 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"github.com/Swatantra-66/go-bookstore/pkg/config"
 	"github.com/Swatantra-66/go-bookstore/pkg/models"
 	"github.com/Swatantra-66/go-bookstore/pkg/utils"
 )
 
 var NewBook models.Book
+
+func getUserEmailFromSession(r *http.Request) string {
+	session, err := config.Store.Get(r, "session-name")
+	if err != nil {
+		return ""
+	}
+	val := session.Values["userEmail"]
+	userEmail, ok := val.(string)
+	if !ok {
+		return ""
+	}
+	return userEmail
+}
 
 func GetBooks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -166,13 +180,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	session, _ := config.Store.Get(r, "session-name")
+	session.Values["userEmail"] = foundUser.Email
+	session.Save(r, w)
+
 	foundUser.Password = ""
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-
-	if err := json.NewEncoder(w).Encode(foundUser); err != nil {
-		http.Error(w, "Error encoding response", http.StatusInternalServerError)
-	}
+	json.NewEncoder(w).Encode(foundUser)
 }
 
 func GetPublicBooks(w http.ResponseWriter, r *http.Request) {
@@ -311,4 +326,72 @@ func GetBookDetailsAI(w http.ResponseWriter, r *http.Request) {
 	} else {
 		http.Error(w, "No info found", http.StatusNotFound)
 	}
+}
+
+func UpdateUser(w http.ResponseWriter, r *http.Request) {
+	userEmail := getUserEmailFromSession(r)
+	if userEmail == "" {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	var req struct {
+		Name string `json:"name"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid input", 400)
+		return
+	}
+
+	if err := config.GetDB().Model(&models.User{}).Where("email = ?", userEmail).Update("name", req.Name).Error; err != nil {
+		http.Error(w, "Database error", 500)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Name updated successfully"})
+}
+
+func ResetLibrary(w http.ResponseWriter, r *http.Request) {
+	userEmail := getUserEmailFromSession(r)
+
+	if userEmail == "" {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	models.DeleteAllBooks(userEmail)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Library reset successfully"})
+}
+
+func UpdatePassword(w http.ResponseWriter, r *http.Request) {
+	userEmail := getUserEmailFromSession(r)
+	if userEmail == "" {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	var req models.User
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid input", 400)
+		return
+	}
+
+	if req.Password == "" {
+		http.Error(w, "Password cannot be empty", 400)
+		return
+	}
+
+	if err := config.GetDB().Model(&models.User{}).Where("email = ?", userEmail).Update("password", req.Password).Error; err != nil {
+		http.Error(w, "Database error", 500)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Password updated successfully"})
 }
