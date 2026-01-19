@@ -29,6 +29,9 @@ func RegisterBookRoutes(router *mux.Router) {
 	router.HandleFunc("/api/public/{username}", handlers.GetPublicBooks).Methods("GET")
 	router.HandleFunc("/recommend", handlers.GetAIRecommendations).Methods("GET")
 	router.HandleFunc("/api/magic-details", handlers.GetBookDetailsAI).Methods("GET")
+	router.HandleFunc("/api/user/update", handlers.UpdateUser).Methods("POST")
+	router.HandleFunc("/api/books/reset", handlers.ResetLibrary).Methods("DELETE")
+	router.HandleFunc("/api/user/password", handlers.UpdatePassword).Methods("POST")
 
 	cssDir := getSafeDir("css")
 	jsDir := getSafeDir("js")
