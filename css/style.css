@@ -876,3 +876,16 @@
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+form[onsubmit="changePassword(event)"] .auth-btn[type="submit"] {
+    background-color: #6c5ce7 !important; 
+    color: white !important;             
+    border: none;
+    transition: all 0.3s ease;
+}
+
+form[onsubmit="changePassword(event)"] .auth-btn[type="submit"]:hover {
+    background-color: #5b4bc4 !important; 
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3);
+}
