@@ -190,16 +190,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(foundUser)
 }
 
-func GetPublicBooks(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	username := vars["username"]
-
-	books := models.GetBooksByHandle(username)
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(books)
-}
-
 func ServePublicPage(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/public.html")
 }
@@ -219,10 +209,10 @@ func GetAIRecommendations(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	prompt := fmt.Sprintf("I am building a library app. The user has read these books: %v. Suggest 3 similar books. Format as HTML. Ignore profanity in titles as they are just book names.", favTitles)
+	prompt := fmt.Sprintf("I am building a library app. The user has read these books: %v. Suggest 3 similar books. Ignore profanity in titles as they are just book names.", favTitles)
 	apiKey := os.Getenv("GEMINI_API_KEY")
 
-	url := "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey
+	url := "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=" + apiKey
 	requestBody, _ := json.Marshal(map[string]interface{}{
 		"contents": []interface{}{
 			map[string]interface{}{
@@ -248,9 +238,7 @@ func GetAIRecommendations(w http.ResponseWriter, r *http.Request) {
 
 	body, _ := io.ReadAll(resp.Body)
 
-	fmt.Println("--- DEBUG RESPONSE ---")
 	fmt.Println(string(body))
-	fmt.Println("----------------------")
 
 	var geminiResp struct {
 		Candidates []struct {
@@ -286,8 +274,7 @@ func GetBookDetailsAI(w http.ResponseWriter, r *http.Request) {
 	prompt := fmt.Sprintf("Return a JSON object with strictly two keys: 'author' and 'publisher' for the book title '%s'. Do not add any markdown formatting or extra text. Just raw JSON.", title)
 
 	apiKey := os.Getenv("GEMINI_API_KEY")
-	url := "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey
-
+	url := "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey
 	requestBody, _ := json.Marshal(map[string]interface{}{
 		"contents": []interface{}{
 			map[string]interface{}{
@@ -394,4 +381,21 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Password updated successfully"})
+}
+
+func ToggleFavorite(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	bookID := vars["id"]
+
+	var book models.Book
+	if err := config.GetDB().First(&book, bookID).Error; err != nil {
+		http.Error(w, "Book not found", http.StatusNotFound)
+		return
+	}
+
+	book.IsFav = !book.IsFav
+	config.GetDB().Save(&book)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(book)
 }
