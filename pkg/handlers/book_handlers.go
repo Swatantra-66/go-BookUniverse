@@ -212,7 +212,7 @@ func GetAIRecommendations(w http.ResponseWriter, r *http.Request) {
 	prompt := fmt.Sprintf("I am building a library app. The user has read these books: %v. Suggest 3 similar books. Ignore profanity in titles as they are just book names.", favTitles)
 	apiKey := os.Getenv("GEMINI_API_KEY")
 
-	url := "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=" + apiKey
+	url := "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey
 	requestBody, _ := json.Marshal(map[string]interface{}{
 		"contents": []interface{}{
 			map[string]interface{}{
@@ -274,7 +274,7 @@ func GetBookDetailsAI(w http.ResponseWriter, r *http.Request) {
 	prompt := fmt.Sprintf("Return a JSON object with strictly two keys: 'author' and 'publisher' for the book title '%s'. Do not add any markdown formatting or extra text. Just raw JSON.", title)
 
 	apiKey := os.Getenv("GEMINI_API_KEY")
-	url := "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey
+	url := "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey
 	requestBody, _ := json.Marshal(map[string]interface{}{
 		"contents": []interface{}{
 			map[string]interface{}{
