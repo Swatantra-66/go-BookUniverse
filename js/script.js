@@ -368,9 +368,9 @@ async function toggleFav(id) {
 
         book.isFav = newStatus;
 
-        const isFavTabActive = document
-            .getElementById("nav-fav")
-            .classList.contains("active");
+        const navFavElement = document.getElementById("nav-fav");
+        const isFavTabActive = navFavElement && navFavElement.classList.contains("active");
+
         if (isFavTabActive) {
             filterFavorites();
         } else {
@@ -486,9 +486,7 @@ function filterBooks() {
 
 function startScanner() {
     if (!navigator.onLine) {
-        alert(
-            "You are offline! 🛑\nWe can scan the barcode, but we can't fetch book details without internet."
-        );
+        alert("You are offline! 🛑\nWe can scan, but can't fetch details.");
         return;
     }
 
@@ -498,36 +496,41 @@ function startScanner() {
     const isMobile = window.innerWidth <= 768;
     const cameraMode = isMobile ? "environment" : "user";
 
-    Quagga.init(
-        {
-            inputStream: {
-                name: "Live",
-                type: "LiveStream",
-                target: document.querySelector("#interactive"),
-                constraints: {
-                    width: 640,
-                    height: 480,
-                    facingMode: cameraMode,
-                },
-            },
-            decoder: {
-                readers: ["ean_reader"],
+    Quagga.init({
+        inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: document.querySelector("#interactive"),
+            constraints: {
+                width: 1280,
+                height: 720,
+                facingMode: cameraMode,
+                aspectRatio: { min: 1, max: 2 }
             },
         },
-        function (err) {
-            if (err) {
-                console.log(err);
-                viewport.style.display = "none";
-                alert(
-                    "Camera error: " +
-                    err.name +
-                    "\n(Make sure you allowed camera permissions!)"
-                );
-                return;
-            }
-            Quagga.start();
+        locator: {
+            patchSize: "medium",
+            halfSample: true
+        },
+        numOfWorkers: 2,
+        decoder: {
+            readers: [
+                "ean_reader",
+                "ean_8_reader",
+                "upc_reader",
+                "code_128_reader"
+            ],
+        },
+        locate: true
+    }, function (err) {
+        if (err) {
+            console.log(err);
+            viewport.style.display = "none";
+            alert("Camera Error: " + err.name + "\nCheck permissions!");
+            return;
         }
-    );
+        Quagga.start();
+    });
 
     Quagga.onDetected(function (data) {
         const code = data.codeResult.code;
