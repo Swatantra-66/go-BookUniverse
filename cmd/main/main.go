@@ -16,9 +16,7 @@ import (
 
 func main() {
 	dir, _ := os.Getwd()
-	fmt.Println("--------------------------------------------------")
-	fmt.Println("📂 SERVER RUNNING FROM:", dir)
-	fmt.Println("--------------------------------------------------")
+	fmt.Println("SERVER RUNNING FROM:", dir)
 
 	err := godotenv.Load()
 	if err != nil {
