@@ -203,7 +203,7 @@ function showAllBooks() {
 }
 
 async function fetchBookData(title, author, imgId, linkId) {
-    const API_KEY = "AIzaSyBzajHqjEaa6i9ZPhP-BDGce_AqN_QlgOA";
+    const API_KEY = "AIzaSyAaVPF_2Z9H8ZJjg-exByUB-NQBNLe1hfY";
     const query = `${title} ${author}`;
 
     try {
