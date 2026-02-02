@@ -203,14 +203,23 @@ function showAllBooks() {
 }
 
 async function fetchBookData(title, author, imgId, linkId) {
+    const API_KEY = "AIzaSyBzajHqjEaa6i9ZPhP-BDGce_AqN_QlgOA";
     const query = `${title} ${author}`;
+
     try {
         const res = await fetch(
             `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(
                 query
-            )}`
+            )}&key=${API_KEY}`
         );
+
+        if (res.status === 429) {
+            console.error("Quota limit reached! Try again later.");
+            return;
+        }
+
         const data = await res.json();
+
         if (data.items && data.items.length > 0) {
             const info = data.items[0].volumeInfo;
 
