@@ -13,7 +13,7 @@ type Book struct {
 	Author      string `json:"author"`
 	Publication string `json:"publication"`
 	UserEmail   string `json:"user_email"`
-	IsFav       bool   `json:"isFav"`
+	IsFav       bool   `json:"isFav" gorm:"default:false"`
 	Status      string `json:"status"`
 }
 
