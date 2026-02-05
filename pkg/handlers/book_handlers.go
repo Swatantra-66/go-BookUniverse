@@ -125,6 +125,7 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	if updateBook.Status != "" {
 		bookDetails.Status = updateBook.Status
 	}
+	bookDetails.IsFav = updateBook.IsFav
 
 	db.Save(&bookDetails)
 
@@ -196,13 +197,19 @@ func ServePublicPage(w http.ResponseWriter, r *http.Request) {
 
 func GetAIRecommendations(w http.ResponseWriter, r *http.Request) {
 	userEmail := r.URL.Query().Get("user")
+
+	fmt.Println("Requesting recs for:", userEmail)
+
 	allBooks := models.GetBooksByUser(userEmail)
 	var favTitles []string
+
 	for _, b := range allBooks {
 		if b.IsFav {
 			favTitles = append(favTitles, b.Name)
 		}
 	}
+
+	fmt.Println("Favorites list:", favTitles)
 
 	if len(favTitles) == 0 {
 		json.NewEncoder(w).Encode(map[string]string{"answer": "<h3>Please favorite some books! ❤️</h3>"})
@@ -213,6 +220,7 @@ func GetAIRecommendations(w http.ResponseWriter, r *http.Request) {
 	apiKey := os.Getenv("GEMINI_API_KEY")
 
 	url := "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey
+
 	requestBody, _ := json.Marshal(map[string]interface{}{
 		"contents": []interface{}{
 			map[string]interface{}{
@@ -238,7 +246,7 @@ func GetAIRecommendations(w http.ResponseWriter, r *http.Request) {
 
 	body, _ := io.ReadAll(resp.Body)
 
-	fmt.Println(string(body))
+	fmt.Println("AI Response:", string(body))
 
 	var geminiResp struct {
 		Candidates []struct {
@@ -260,7 +268,7 @@ func GetAIRecommendations(w http.ResponseWriter, r *http.Request) {
 		aiText := geminiResp.Candidates[0].Content.Parts[0].Text
 		json.NewEncoder(w).Encode(map[string]string{"answer": aiText})
 	} else {
-		json.NewEncoder(w).Encode(map[string]string{"answer": "Sorry, the AI is still blocking your book list. Try removing the book with the swear word to test if it works!"})
+		json.NewEncoder(w).Encode(map[string]string{"answer": "Sorry, no response generated."})
 	}
 }
 
