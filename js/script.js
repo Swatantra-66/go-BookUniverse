@@ -1,5 +1,4 @@
 const API_URL = "/book";
-const DEFAULT_PROFILE_IMG = "https://i.ibb.co/TCL3d2Q/0x8.webp";
 
 let allBooks = [];
 let isEditing = false;
@@ -811,31 +810,20 @@ async function updateProfile(e) {
     });
 
     if (res.ok) {
-        const keysToCheck = ['user', 'currentUser', 'profile', 'userData'];
+        let user = JSON.parse(localStorage.getItem("bookUser"));
 
-        for (const key of keysToCheck) {
-            const storedData = localStorage.getItem(key);
-            if (storedData) {
-                try {
-                    let userObj = JSON.parse(storedData);
+        if (user) {
+            user.name = name;
+            if (user.username) user.username = name;
 
-                    userObj.name = name;
-                    if (userObj.username) userObj.username = name;
+            localStorage.setItem("bookUser", JSON.stringify(user));
 
-                    localStorage.setItem(key, JSON.stringify(userObj));
-                    console.log(`Updated name in ${key} storage!`);
-                } catch (e) {
-                }
-            }
+            updateProfileUI(user);
         }
 
-        localStorage.setItem("username", name);
-
-        document.getElementById('user-name').innerText = name;
-        showToast("Username updated! Reloading...");
+        showToast("Profile updated successfully! ✨");
         toggleSettings();
 
-        setTimeout(() => location.reload(), 1000);
     } else {
         const errorText = await res.text();
         alert("Server Error: " + errorText);
