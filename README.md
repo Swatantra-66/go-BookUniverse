@@ -48,7 +48,10 @@ This full-stack application combines a high-performance REST API written in Go w
 
 - Go installed (v1.18+)
 - MySQL installed and running
-- A free [Google Gemini API Key](https://aistudio.google.com/)
+- A Tier-1 [Google Gemini API Key]
+- Obtain a Gemini API Key from [Google AI Studio](https://aistudio.google.com/).
+- **Note:** This project is configured for the **Paid Tier**. Ensure your API key is linked to a Google Cloud Billing account to avoid rate-limiting issues during heavy testing.
+- Add `GEMINI_API_KEY` to your environment variables.
 
 ### Installation
 
@@ -68,6 +71,10 @@ This full-stack application combines a high-performance REST API written in Go w
     DB_NAME=simplerest
     GEMINI_API_KEY=your_google_ai_key_here
     ```
+
+    - **API Provider:** [Google AI Studio](https://aistudio.google.com/)
+    - **Tier:** Pay-as-you-go (Tier 1) backed by Google Cloud Billing.
+    - **Credit Status:** Active ($300 Credit applied)
 
 3.  **Install Go Dependencies**
 
